@@ -223,6 +223,30 @@ The `specify` command supports the following options:
 | `--debug`              | Flag     | Enable detailed debug output for troubleshooting                                                                                                                                             |
 | `--github-token`       | Option   | GitHub token for API requests (or set GH_TOKEN/GITHUB_TOKEN env variable)                                                                                                                    |
 | `--ai-skills`          | Flag     | Install Prompt.MD templates as agent skills in agent-specific `skills/` directory (requires `--ai`)                                                                                          |
+| `--ykj`                | Flag     | Apply YKJ custom command overlay (adds `/speckit.design` + modified specify/plan). Requires `SPECKIT_YKJ_HOME` env var                                                                      |
+
+### YKJ Custom Overlay Setup
+
+The `--ykj` flag applies a custom command overlay that adds the optional design mockup stage to the Spec Kit workflow. To set it up:
+
+```bash
+# 1. Clone the fork
+git clone https://github.com/Youkamii/spec-kit.git
+
+# 2. Run the setup script (adds env var + alias to your shell profile)
+bash spec-kit/scripts/setup-ykj.sh
+
+# 3. Restart terminal or reload profile
+source ~/.zshrc
+
+# 4. Use it
+specify init my-project --ai claude --ykj
+```
+
+This overlay adds:
+- `/speckit.design` — Analyze UI components and generate wireframe prototypes (between specify and plan)
+- Modified `/speckit.specify` — Prompts the user to optionally run the design stage
+- Modified `/speckit.plan` — Automatically reads design artifacts when present
 
 ### Examples
 
@@ -290,6 +314,9 @@ specify init my-project --ai claude --ai-skills
 
 # Initialize in current directory with agent skills
 specify init --here --ai gemini --ai-skills
+
+# Apply YKJ custom overlay (adds design mockup stage)
+specify init my-project --ai claude --ykj
 
 # Check system requirements
 specify check

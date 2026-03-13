@@ -1284,6 +1284,7 @@ def init(
     debug: bool = typer.Option(False, "--debug", help="Show verbose diagnostic output for network and extraction failures"),
     github_token: str = typer.Option(None, "--github-token", help="GitHub token to use for API requests (or set GH_TOKEN or GITHUB_TOKEN environment variable)"),
     ai_skills: bool = typer.Option(False, "--ai-skills", help="Install Prompt.MD templates as agent skills (requires --ai)"),
+    ykj: bool = typer.Option(False, "--ykj", help="Apply YKJ custom command overlay (design mockup stage + modified specify/plan). Requires SPECKIT_YKJ_HOME env var."),
 ):
     """
     Initialize a new Specify project from the latest template.
@@ -1312,6 +1313,7 @@ def init(
         specify init my-project --ai claude --ai-skills   # Install agent skills
         specify init --here --ai gemini --ai-skills
         specify init my-project --ai generic --ai-commands-dir .myagent/commands/  # Unsupported agent
+        specify init my-project --ai claude --ykj        # Apply YKJ custom overlay (design stage)
     """
 
     show_banner()
@@ -1554,6 +1556,34 @@ def init(
             else:
                 tracker.skip("git", "--no-git flag")
 
+            # Apply YKJ custom overlay if requested
+            if ykj:
+                tracker.add("ykj", "Apply YKJ overlay")
+                tracker.start("ykj")
+                ykj_home = os.environ.get("SPECKIT_YKJ_HOME", "")
+                if not ykj_home:
+                    tracker.error("ykj", "SPECKIT_YKJ_HOME not set")
+                    console.print("[red]Error:[/red] --ykj requires SPECKIT_YKJ_HOME environment variable.")
+                    console.print("[yellow]Run:[/yellow] export SPECKIT_YKJ_HOME=/path/to/your/spec-kit/fork")
+                else:
+                    ykj_templates = Path(ykj_home) / "templates" / "commands"
+                    if not ykj_templates.is_dir():
+                        tracker.error("ykj", f"templates not found at {ykj_templates}")
+                    else:
+                        agent_cfg = AGENT_CONFIG.get(selected_ai, {})
+                        agent_folder = ai_commands_dir if selected_ai == "generic" else agent_cfg.get("folder", "")
+                        commands_subdir = agent_cfg.get("commands_subdir", "commands")
+                        if agent_folder:
+                            cmd_dir = project_path / agent_folder.rstrip("/") / commands_subdir
+                            cmd_dir.mkdir(parents=True, exist_ok=True)
+                            copied = 0
+                            for tmpl_file in ykj_templates.glob("*.md"):
+                                dest_name = f"speckit.{tmpl_file.name}"
+                                dest_path = cmd_dir / dest_name
+                                shutil.copy2(tmpl_file, dest_path)
+                                copied += 1
+                            tracker.complete("ykj", f"{copied} commands overlaid")
+
             tracker.complete("final", "project ready")
         except Exception as e:
             tracker.error("final", str(e))
@@ -1644,9 +1674,11 @@ def init(
         "Optional commands that you can use for your specs [bright_black](improve quality & confidence)[/bright_black]",
         "",
         "○ [cyan]/speckit.clarify[/] [bright_black](optional)[/bright_black] - Ask structured questions to de-risk ambiguous areas before planning (run before [cyan]/speckit.plan[/] if used)",
+        "○ [cyan]/speckit.design[/] [bright_black](optional)[/bright_black] - Analyze UI components and generate visual mockups (after [cyan]/speckit.specify[/], before [cyan]/speckit.plan[/])" if ykj else None,
         "○ [cyan]/speckit.analyze[/] [bright_black](optional)[/bright_black] - Cross-artifact consistency & alignment report (after [cyan]/speckit.tasks[/], before [cyan]/speckit.implement[/])",
         "○ [cyan]/speckit.checklist[/] [bright_black](optional)[/bright_black] - Generate quality checklists to validate requirements completeness, clarity, and consistency (after [cyan]/speckit.plan[/])"
     ]
+    enhancement_lines = [line for line in enhancement_lines if line is not None]
     enhancements_panel = Panel("\n".join(enhancement_lines), title="Enhancement Commands", border_style="cyan", padding=(1,2))
     console.print()
     console.print(enhancements_panel)
