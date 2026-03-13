@@ -5,7 +5,7 @@ This guide will help you get started with Spec-Driven Development using Spec Kit
 > [!NOTE]
 > All automation scripts now provide both Bash (`.sh`) and PowerShell (`.ps1`) variants. The `specify` CLI auto-selects based on OS unless you pass `--script sh|ps`.
 
-## The 6-Step Process
+## The 7-Step Process
 
 > [!TIP]
 > **Context Awareness**: Spec Kit commands automatically detect the active feature based on your current Git branch (e.g., `001-feature-name`). To switch between different specifications, simply switch Git branches.
@@ -53,7 +53,23 @@ uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME
 /speckit.clarify Focus on security and performance requirements.
 ```
 
-### Step 5: Create a Technical Implementation Plan
+### Step 5: (Optional) Generate Visual Mockups
+
+If your feature involves a user interface, use the `/speckit.design` slash command to analyze UI components from the spec and generate wireframe prototypes.
+
+```markdown
+/speckit.design
+```
+
+This creates a `mockups/` directory containing:
+- `components.md` — Screen and component analysis
+- `wireframes/` — Directory for externally generated wireframe images
+- `prototypes/index.html` + `styles.css` — Low-fidelity HTML/CSS wireframes
+
+> [!TIP]
+> **Skip this step** if your feature is a backend service, library, or CLI tool with no user-facing interface. The agent will suggest this option after `/speckit.specify` completes.
+
+### Step 6: Create a Technical Implementation Plan
 
 **In the chat**, use the `/speckit.plan` slash command to provide your tech stack and architecture choices.
 
@@ -61,7 +77,7 @@ uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME
 /speckit.plan The application uses Vite with minimal number of libraries. Use vanilla HTML, CSS, and JavaScript as much as possible. Images are not uploaded anywhere and metadata is stored in a local SQLite database.
 ```
 
-### Step 6: Break Down and Implement
+### Step 7: Break Down and Implement
 
 **In the chat**, use the `/speckit.tasks` slash command to create an actionable task list.
 
@@ -130,7 +146,17 @@ Validate the specification checklist using the `/speckit.checklist` command:
 /speckit.checklist
 ```
 
-### Step 5: Generate Technical Plan with `/speckit.plan`
+### Step 5: (Optional) Generate Visual Mockups
+
+Since Taskify has a user-facing interface (Kanban boards, user selection, task cards), generating mockups helps the plan phase understand the UI structure:
+
+```bash
+/speckit.design
+```
+
+This creates `mockups/` with component analysis and HTML/CSS wireframe prototypes.
+
+### Step 6: Generate Technical Plan with `/speckit.plan`
 
 Be specific about your tech stack and technical requirements:
 
@@ -138,7 +164,7 @@ Be specific about your tech stack and technical requirements:
 /speckit.plan We are going to generate this using .NET Aspire, using Postgres as the database. The frontend should use Blazor server with drag-and-drop task boards, real-time updates. There should be a REST API created with a projects API, tasks API, and a notifications API.
 ```
 
-### Step 6: Define Tasks
+### Step 7: Define Tasks
 
 Generate an actionable task list using the `/speckit.tasks` command:
 
@@ -146,7 +172,7 @@ Generate an actionable task list using the `/speckit.tasks` command:
 /speckit.tasks
 ```
 
-### Step 7: Validate and Implement
+### Step 8: Validate and Implement
 
 Have your AI agent audit the implementation plan using `/speckit.analyze`:
 

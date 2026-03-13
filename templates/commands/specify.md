@@ -1,6 +1,9 @@
 ---
 description: Create or update the feature specification from a natural language feature description.
-handoffs: 
+handoffs:
+  - label: Design Mockups (Optional)
+    agent: speckit.design
+    prompt: Analyze UI components and generate visual mockups
   - label: Build Technical Plan
     agent: speckit.plan
     prompt: Create a plan for the spec. I am building with...
@@ -174,7 +177,19 @@ Given that feature description, do this:
 
    d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
 
-7. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/speckit.clarify` or `/speckit.plan`).
+7. Report completion with branch name, spec file path, checklist results, and readiness for the next phase.
+
+   **Next step guidance** — Present the following options to the user:
+
+   > **What would you like to do next?**
+   >
+   > 1. `/speckit.design` — Generate visual mockups (wireframes + HTML/CSS prototypes) for this feature's UI. **Recommended if this feature has a user-facing interface.**
+   > 2. `/speckit.clarify` — Resolve ambiguities in the spec before planning.
+   > 3. `/speckit.plan` — Skip directly to technical planning.
+   >
+   > If this feature involves screens or user interactions, running `/speckit.design` first gives `/speckit.plan` better context about the UI structure.
+
+   Wait for the user's choice before proceeding.
 
 **NOTE:** The script creates and checks out the new branch and initializes the spec file before writing.
 

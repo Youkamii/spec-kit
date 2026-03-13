@@ -30,6 +30,16 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 2. **Load context**: Read FEATURE_SPEC and `/memory/constitution.md`. Load IMPL_PLAN template (already copied).
 
+   **Check for design mockups**: If `SPECS_DIR/mockups/` exists, also read:
+   - `mockups/components.md` — UI component analysis (screens, elements, states, flows)
+   - `mockups/prototypes/index.html` and `mockups/prototypes/styles.css` — wireframe prototypes
+
+   Incorporate this information into the technical plan:
+   - Use identified screens/components to inform project structure decisions
+   - Reference component relationships when defining data models
+   - Use screen flow to inform API contract design (if applicable)
+   - If mockups exist, note them as design inputs in the plan summary
+
 3. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
    - Fill Technical Context (mark unknowns as "NEEDS CLARIFICATION")
    - Fill Constitution Check section from constitution
